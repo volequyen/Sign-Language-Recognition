@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Language Recognition</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/SignHand.png') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="title">
+        <h1>SIGN LANGUAGE RECOGNITION</h1>
+    </div>
+
+    <div class="container">
+        <!-- LEFT: CAMERA -->
+        <div class="left-panel">
+            <video id="video" autoplay></video>
+            <button id="capture-btn">CHỤP ẢNH</button>
+            <canvas id="canvas" width="300" height="200" style="display:none"></canvas>
+        </div>
+
+        <!-- RIGHT: MODEL RESULTS -->
+        <div class="right-panel">
+            <h2>KẾT QUẢ NHẬN DIỆN</h2>
+            <div class="result-box">
+                <h3>MÔ HÌNH RESNET:</h3>
+                <p id="model1-result">...</p>
+            </div>
+
+            <div class="result-box">
+                <h3>MÔ HÌNH VGG:</h3>
+                <p id="model2-result">...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>ẢNH ĐÃ CHỤP</h2>
+                <span class="close">&times;</span>
+            </div>
+            <img id="captured-image" alt="Captured image">
+            <div class="modal-buttons">
+                <button class="modal-btn recognize-btn" id="recognize-btn">NHẬN DIỆN</button>
+                <button class="modal-btn retake-btn" id="retake-btn">CHỤP LẠI</button>
+            </div>
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Đang nhận diện...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const video = document.getElementById("video");
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const modal = document.getElementById("imageModal");
+        const capturedImage = document.getElementById("captured-image");
+        const closeBtn = document.querySelector(".close");
+        const captureBtn = document.getElementById("capture-btn");
+        const recognizeBtn = document.getElementById("recognize-btn");
+        const retakeBtn = document.getElementById("retake-btn");
+        const loading = document.getElementById("loading");
+
+        let currentImageData = null;
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => {
+                video.srcObject = stream;
+            })
+            .catch(err => {
+                alert("Không thể truy cập camera: " + err.message);
+            });
+
+        captureBtn.addEventListener("click", () => {
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            currentImageData = canvas.toDataURL("image/png");
+            capturedImage.src = currentImageData;
+            modal.style.display = "block";
+        });
+
+        closeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        window.addEventListener("click", (event) => {
+            if (event.target === modal) {
+                modal.style.display = "none";
+            }
+        });
+
+        retakeBtn.addEventListener("click", () => {
+            modal.style.display = "none";
+        });
+
+        recognizeBtn.addEventListener("click", () => {
+            if (!currentImageData) {
+                alert("Chưa có ảnh để nhận diện!");
+                return;
+            }
+
+            loading.style.display = "block";
+            recognizeBtn.disabled = true;
+            retakeBtn.disabled = true;
+
+            fetch("/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ image: currentImageData })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    alert(data.error);
+                } else {
+                    document.getElementById("model1-result").innerText = data.model1;
+                    document.getElementById("model2-result").innerText = data.model2;
+                }
+
+                loading.style.display = "none";
+                recognizeBtn.disabled = false;
+                retakeBtn.disabled = false;
+                modal.style.display = "none";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("Có lỗi xảy ra khi nhận diện!");
+                loading.style.display = "none";
+                recognizeBtn.disabled = false;
+                retakeBtn.disabled = false;
+            });
+        });
+    </script>
+</body>
+</html>
