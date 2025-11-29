@@ -21,17 +21,18 @@ def predict():
     img_bytes = base64.b64decode(img_base64)
     img_np = np.frombuffer(img_bytes, np.uint8)
     frame = cv2.imdecode(img_np, cv2.IMREAD_COLOR)
+    print(">> Ảnh đã gửi lên server (kích thước gốc):", frame.shape)
     resized_img = cv2.resize(frame, (224, 224))
+    print(">> Ảnh đã resize:", resized_img.shape)
 
     resized_img_rgb = cv2.cvtColor(resized_img, cv2.COLOR_BGR2RGB)
 
     resized_img_rgb = resized_img_rgb.astype("float32") / 255.0
     resized_img_rgb = np.expand_dims(resized_img_rgb, axis=0)  # (1,224,224,3)
+    print(">> Ảnh đã chuẩn hoá:", resized_img_rgb.shape)
 
-    # TODO: chạy mô hình ở đây → model.predict(resized_img_rgb)
-
-    model1_result = "Dự đoán Mô hình RESNET: A"
-    model2_result = "Dự đoán Mô hình VGG: B"
+    model1_result = "Dự đoán Mô hình RESNET: "
+    model2_result = "Dự đoán Mô hình MOBILENET: "
 
     return jsonify({
         "model1": model1_result,

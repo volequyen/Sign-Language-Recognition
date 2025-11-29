@@ -1,0 +1,51 @@
+# ---------------------------
+# Python / Flask .gitignore
+# ---------------------------
+
+# Virtual environment
+venv/
+env/
+.venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# TensorFlow serialized model files
+*.keras
+*.h5
+*.hdf5
+*.pb
+*.tflite
+
+# Model checkpoints
+checkpoint/
+checkpoints/
+*.ckpt*
+
+# macOS system files
+.DS_Store
+
+# VSCode settings
+.vscode/
+.history/
+
+# Logs
+*.log
+
+# Flask temporary folders
+instance/
+uploads/
+tmp/
+cache/
+
+# Environment variables
+.env
+.env.*
+
+# Build
+dist/
+build/
+*.egg-info/

@@ -15,7 +15,7 @@
         <div class="left-panel">
             <video id="video" autoplay></video>
             <button id="capture-btn">CHỤP ẢNH</button>
-            <canvas id="canvas" width="300" height="200" style="display:none"></canvas>
+            <canvas id="canvas" width="224" height="224" style="display:none"></canvas>
         </div>
 
         <!-- RIGHT: MODEL RESULTS -->
@@ -27,7 +27,7 @@
             </div>
 
             <div class="result-box">
-                <h3>MÔ HÌNH VGG:</h3>
+                <h3>MÔ HÌNH MOBILENET:</h3>
                 <p id="model2-result">...</p>
             </div>
         </div>
@@ -106,18 +106,19 @@
             recognizeBtn.disabled = true;
             retakeBtn.disabled = true;
 
-            fetch("/predict", {
+            fetch("http://127.0.0.1:5001/predict", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ image: currentImageData })
             })
             .then(res => res.json())
             .then(data => {
+                console.log("Kết quả từ server:", data);
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    document.getElementById("model1-result").innerText = data.model1;
-                    document.getElementById("model2-result").innerText = data.model2;
+                    document.getElementById("model1-result").innerText = data.result;
+                    // document.getElementById("model2-result").innerText = data.result;
                 }
 
                 loading.style.display = "none";
