@@ -14,7 +14,14 @@
         <!-- LEFT: CAMERA -->
         <div class="left-panel">
             <video id="video" autoplay></video>
-            <button id="capture-btn">CHỤP ẢNH</button>
+
+            <div style="display: flex; gap: 10px;">
+                <button id="capture-btn">CHỤP ẢNH</button>
+                <button id="upload-btn">UPLOAD ẢNH</button>
+            </div>
+
+            <input type="file" id="upload-input" accept="image/*" style="display:none">
+
             <canvas id="canvas" width="224" height="224" style="display:none"></canvas>
         </div>
 
@@ -37,13 +44,13 @@
     <div id="imageModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>ẢNH ĐÃ CHỤP</h2>
+                <h2>XEM TRƯỚC</h2>
                 <span class="close">&times;</span>
             </div>
             <img id="captured-image" alt="Captured image">
             <div class="modal-buttons">
                 <button class="modal-btn recognize-btn" id="recognize-btn">NHẬN DIỆN</button>
-                <button class="modal-btn retake-btn" id="retake-btn">CHỤP LẠI</button>
+                <button class="modal-btn retake-btn" id="retake-btn">THOÁT</button>
             </div>
             <div class="loading" id="loading">
                 <div class="spinner"></div>
@@ -61,12 +68,15 @@
         const capturedImage = document.getElementById("captured-image");
         const closeBtn = document.querySelector(".close");
         const captureBtn = document.getElementById("capture-btn");
+
+        const uploadBtn = document.getElementById("upload-btn");
+        const uploadInput = document.getElementById("upload-input");
+
         const recognizeBtn = document.getElementById("recognize-btn");
         const retakeBtn = document.getElementById("retake-btn");
         const loading = document.getElementById("loading");
 
         let currentImageData = null;
-
         navigator.mediaDevices.getUserMedia({ video: true })
             .then(stream => {
                 video.srcObject = stream;
@@ -82,6 +92,23 @@
             modal.style.display = "block";
         });
 
+        uploadBtn.addEventListener("click", () => {
+            uploadInput.click();
+        });
+
+        uploadInput.addEventListener("change", (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentImageData = e.target.result; 
+                capturedImage.src = currentImageData;
+                modal.style.display = "block";
+            };
+            reader.readAsDataURL(file); 
+        });
+
         closeBtn.addEventListener("click", () => {
             modal.style.display = "none";
         });
@@ -95,7 +122,7 @@
         retakeBtn.addEventListener("click", () => {
             modal.style.display = "none";
         });
-
+        
         recognizeBtn.addEventListener("click", () => {
             if (!currentImageData) {
                 alert("Chưa có ảnh để nhận diện!");
@@ -113,12 +140,11 @@
             })
             .then(res => res.json())
             .then(data => {
-                console.log("Kết quả từ server:", data);
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    document.getElementById("model1-result").innerText = data.result;
-                    // document.getElementById("model2-result").innerText = data.result;
+                    document.getElementById("model1-result").innerText = data.model1;
+                    document.getElementById("model2-result").innerText = data.model2;
                 }
 
                 loading.style.display = "none";

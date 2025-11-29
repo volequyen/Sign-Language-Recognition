@@ -55,6 +55,25 @@ video {
     color: #0f172a;
 }
 
+#upload-btn{
+    margin-top: 15px;
+    padding: 12px 20px;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    color: white;
+    font-size: 16px;
+    flex: auto;
+    align-items: center;
+    justify-items: center;
+}
+
+#upload-btn:hover {
+    background: white;
+    color: #0f172a;
+}
+
 /* RIGHT PANEL */
 .right-panel {
     width: 45%;
