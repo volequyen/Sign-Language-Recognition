@@ -174,5 +174,7 @@ def predict():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    print("Server chạy tại http://127.0.0.1:5001")
-    app.run(debug=False, port=5001)
+    port = int(os.environ.get("PORT", 5000))
+    print(f"Server chạy tại 0.0.0.0:{port}")
+    app.run(host="0.0.0.0", port=port)
+
