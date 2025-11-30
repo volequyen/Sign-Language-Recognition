@@ -12,8 +12,11 @@ from torchvision import models
 from torchvision.models import resnet50
 
 app = Flask(__name__)
-
-CORS(app, resources={r"/predict": {"origins": "sign-language-recognition-production.up.railway.app"}})
+CORS(app, resources={
+    r"/predict": {
+        "origins": "https://sign-language-recognition-production.up.railway.app"
+    }
+})
 
 def build_resnet50(num_classes: int = 24):
     model = resnet50(weights=None)
